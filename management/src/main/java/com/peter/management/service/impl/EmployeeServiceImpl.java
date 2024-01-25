@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class EmployeeServiceImpl implements EmployeeService {
 
     private EmployeeRepository employeeRepository;
+
     @Override
     public EmployeeDto createEmployee(EmployeeDto employeeDto) {
 
@@ -28,7 +29,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeDto getEmployeeById(Long employeeId) {
-     Employee employee =    employeeRepository.findById(employeeId)
+        Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee with the ID" + employeeId + " not found"));
 
         return EmployeeMapper.mapToEmployeeDto(employee);
@@ -37,7 +38,31 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<EmployeeDto> getAllEmployee() {
         List<Employee> employees = employeeRepository.findAll();
-        return employees.stream().map((employee)-> EmployeeMapper.mapToEmployeeDto(employee))
+        return employees.stream().map((employee) -> EmployeeMapper.mapToEmployeeDto(employee))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public EmployeeDto updateEmployee(Long employeeId, EmployeeDto updateEmployeeDto) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee with the ID" + employeeId + " not found"));
+
+
+        employee.setEmail(updateEmployeeDto.getEmail());
+        employee.setFirstName(updateEmployeeDto.getFirstName());
+        employee.setLastName(updateEmployeeDto.getLastName());
+
+        Employee updateEmployeeObj = employeeRepository.save(employee);
+
+        return EmployeeMapper.mapToEmployeeDto(updateEmployeeObj);
+    }
+
+    @Override
+    public void deleteEmployee(Long employeeId) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee with the ID" + employeeId + " not found"));
+
+        employeeRepository.deleteById(employee.getId());
+    }
+
 }
